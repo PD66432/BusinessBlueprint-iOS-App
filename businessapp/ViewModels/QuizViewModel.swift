@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Combine
 
 class QuizViewModel: ObservableObject {
     @Published var currentStep: QuizStep = .welcome
@@ -7,6 +8,8 @@ class QuizViewModel: ObservableObject {
     @Published var selectedPersonality: Set<String> = []
     @Published var selectedInterests: Set<String> = []
     @Published var userProfile: UserProfile?
+    @Published var businessIdeas: [BusinessIdea] = []
+    @Published var isLoading = false
     
     let allSkills = [
         "Programming", "Data Analysis", "Design", "Marketing", "Sales",

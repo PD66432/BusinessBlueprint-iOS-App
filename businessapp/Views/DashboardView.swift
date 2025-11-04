@@ -227,7 +227,7 @@ struct MilestoneChartView: View {
             Chart {
                 ForEach(Array(milestones.enumerated()), id: \.element.id) { index, milestone in
                     BarMark(
-                        x: .value("Milestone", milestone.title.prefix(10)),
+                        x: .value("Milestone", String(milestone.title.prefix(10))),
                         y: .value("Progress", milestone.completed ? 100 : 0)
                     )
                     .foregroundStyle(milestone.completed ? Color.green : Color.orange)

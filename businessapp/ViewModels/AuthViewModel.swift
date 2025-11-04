@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Combine
 
 class AuthViewModel: ObservableObject {
     @Published var isLoggedIn = false

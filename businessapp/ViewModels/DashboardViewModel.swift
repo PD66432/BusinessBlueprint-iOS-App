@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Combine
 
 class DashboardViewModel: ObservableObject {
     @Published var dailyGoals: [DailyGoal] = []
@@ -81,7 +82,7 @@ class DashboardViewModel: ObservableObject {
     
     func toggleGoalCompletion(_ goalId: String) {
         if let index = dailyGoals.firstIndex(where: { $0.id == goalId }) {
-            var goal = dailyGoals[index]
+            let goal = dailyGoals[index]
             // In a real app, update Firebase here
             dailyGoals[index] = DailyGoal(
                 id: goal.id,
@@ -99,7 +100,7 @@ class DashboardViewModel: ObservableObject {
     
     func toggleMilestoneCompletion(_ milestoneId: String) {
         if let index = milestones.firstIndex(where: { $0.id == milestoneId }) {
-            var milestone = milestones[index]
+            let milestone = milestones[index]
             milestones[index] = Milestone(
                 id: milestone.id,
                 businessIdeaId: milestone.businessIdeaId,
