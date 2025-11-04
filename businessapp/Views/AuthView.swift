@@ -5,7 +5,7 @@ struct AuthView: View {
     @Environment(\.dismiss) var dismiss
     @State private var email = ""
     @State private var password = ""
-    @State private var isSignUp = true
+    @State var isSignUp: Bool = true
     
     var body: some View {
         NavigationStack {
@@ -89,6 +89,11 @@ struct AuthView: View {
                         .foregroundColor(.white)
                         .cornerRadius(12)
                         .disabled(email.isEmpty || password.isEmpty || viewModel.isLoading)
+                        .onChange(of: viewModel.isLoggedIn) { _, newValue in
+                            if newValue {
+                                dismiss()
+                            }
+                        }
                     }
                     .padding(.horizontal, 20)
                     

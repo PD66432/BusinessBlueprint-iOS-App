@@ -9,11 +9,78 @@ class DashboardViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var completionPercentage: Int = 0
+    @Published var aiGeneratedGoals: [String] = []
+    @Published var aiAdvice: String = ""
+    @Published var isGeneratingAIContent = false
     
     private var userId: String?
     
     init(userId: String? = nil) {
         self.userId = userId
+    }
+    
+    // MARK: - AI-Powered Features
+    
+    func generateAIDailyGoals(for businessIdea: BusinessIdea) {
+        isGeneratingAIContent = true
+        
+        GoogleAIService.shared.generateDailyGoals(
+            businessIdea: businessIdea,
+            currentProgress: completionPercentage
+        ) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isGeneratingAIContent = false
+                switch result {
+                case .success(let goals):
+                    self?.aiGeneratedGoals = goals
+                    print("✅ Generated \(goals.count) AI-powered daily goals")
+                case .failure(let error):
+                    print("⚠️ Error generating goals: \(error.localizedDescription)")
+                    self?.aiGeneratedGoals = [
+                        "Research target market and validate demand",
+                        "Create a minimum viable product (MVP) outline",
+                        "Connect with 3 potential customers or mentors"
+                    ]
+                }
+            }
+        }
+    }
+    
+    func getAIAdvice(context: String) {
+        isGeneratingAIContent = true
+        let currentGoals = dailyGoals.map { $0.title }
+        
+        GoogleAIService.shared.getPersonalizedAdvice(
+            context: context,
+            userGoals: currentGoals
+        ) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isGeneratingAIContent = false
+                switch result {
+                case .success(let advice):
+                    self?.aiAdvice = advice
+                    print("✅ Received AI advice")
+                case .failure(let error):
+                    print("⚠️ Error getting advice: \(error.localizedDescription)")
+                    self?.aiAdvice = "Focus on your most important goals first. Break down large tasks into smaller, manageable steps. Celebrate small wins along the way!"
+                }
+            }
+        }
+    }
+    
+    func addAIGoalToDashboard(_ goalTitle: String, businessIdeaId: String) {
+        let goal = DailyGoal(
+            id: UUID().uuidString,
+            businessIdeaId: businessIdeaId,
+            title: goalTitle,
+            description: "AI-generated goal",
+            dueDate: Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date(),
+            completed: false,
+            priority: "medium",
+            createdAt: Date(),
+            userId: userId ?? ""
+        )
+        addDailyGoal(goal)
     }
     
     func fetchDashboardData(businessIdeaId: String) {

@@ -4,6 +4,7 @@ struct QuizView: View {
     @StateObject private var viewModel = QuizViewModel()
     @State private var firstName = ""
     @State private var lastName = ""
+    var onComplete: (() -> Void)? = nil
     
     var body: some View {
         ZStack {
@@ -57,7 +58,28 @@ struct QuizView: View {
                         }
                     }
                     
-                    if viewModel.currentStep != .results && viewModel.currentStep != .loading {
+                    if viewModel.currentStep == .results {
+                        Button(action: { 
+                            onComplete?()
+                        }) {
+                            Text("Continue to Dashboard")
+                                .font(.system(size: 16, weight: .semibold))
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 52)
+                                .background(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color(red: 1, green: 0.6, blue: 0.2),
+                                            Color(red: 1, green: 0.4, blue: 0.1)
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .foregroundColor(.white)
+                                .cornerRadius(12)
+                        }
+                    } else if viewModel.currentStep != .loading {
                         Button(action: { viewModel.nextStep() }) {
                             Text("Next")
                                 .font(.system(size: 16, weight: .semibold))
@@ -125,13 +147,30 @@ struct SkillsStepView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("What are your key skills?")
-                .font(.system(size: 24, weight: .bold))
-                .foregroundColor(.white)
-            
-            Text("Select all that apply")
-                .font(.system(size: 14))
-                .foregroundColor(.white.opacity(0.7))
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("What are your key skills?")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Text("Select all that apply")
+                        .font(.system(size: 14))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                
+                Spacer()
+                
+                if viewModel.isGeneratingOptions {
+                    HStack(spacing: 6) {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .orange))
+                            .scaleEffect(0.8)
+                        Text("AI")
+                            .font(.caption.bold())
+                            .foregroundColor(.orange)
+                    }
+                }
+            }
             
             VStack(spacing: 12) {
                 ForEach(viewModel.allSkills, id: \.self) { skill in
@@ -151,13 +190,30 @@ struct PersonalityStepView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Describe your personality")
-                .font(.system(size: 24, weight: .bold))
-                .foregroundColor(.white)
-            
-            Text("Choose traits that define you")
-                .font(.system(size: 14))
-                .foregroundColor(.white.opacity(0.7))
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("Describe your personality")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Text("Choose traits that define you")
+                        .font(.system(size: 14))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                
+                Spacer()
+                
+                if viewModel.isGeneratingOptions {
+                    HStack(spacing: 6) {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .orange))
+                            .scaleEffect(0.8)
+                        Text("AI")
+                            .font(.caption.bold())
+                            .foregroundColor(.orange)
+                    }
+                }
+            }
             
             VStack(spacing: 12) {
                 ForEach(viewModel.allPersonality, id: \.self) { trait in
@@ -177,13 +233,30 @@ struct InterestsStepView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("What interests you?")
-                .font(.system(size: 24, weight: .bold))
-                .foregroundColor(.white)
-            
-            Text("Select your areas of interest")
-                .font(.system(size: 14))
-                .foregroundColor(.white.opacity(0.7))
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("What interests you?")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Text("Select your areas of interest")
+                        .font(.system(size: 14))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                
+                Spacer()
+                
+                if viewModel.isGeneratingOptions {
+                    HStack(spacing: 6) {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .orange))
+                            .scaleEffect(0.8)
+                        Text("AI")
+                            .font(.caption.bold())
+                            .foregroundColor(.orange)
+                    }
+                }
+            }
             
             VStack(spacing: 12) {
                 ForEach(viewModel.allInterests, id: \.self) { interest in
@@ -227,21 +300,76 @@ struct PersonalInfoStepView: View {
 
 struct LoadingStepView: View {
     var body: some View {
-        VStack(spacing: 24) {
-            ProgressView()
-                .scaleEffect(2)
-                .tint(Color(red: 1, green: 0.6, blue: 0.2))
+        VStack(spacing: 32) {
+            // AI Brain Animation
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [.orange.opacity(0.3), .pink.opacity(0.3)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 120, height: 120)
+                
+                Image(systemName: "brain.head.profile")
+                    .font(.system(size: 50))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.orange, .pink],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                
+                ProgressView()
+                    .scaleEffect(2.5)
+                    .tint(.white.opacity(0.8))
+            }
             
-            Text("Generating Your Ideas...")
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundColor(.white)
+            VStack(spacing: 12) {
+                HStack(spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .foregroundColor(.orange)
+                    Text("AI is Thinking...")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(.white)
+                }
+                
+                Text("Google Gemini is analyzing your profile and generating personalized business ideas tailored just for you")
+                    .font(.system(size: 14))
+                    .foregroundColor(.white.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 20)
+            }
             
-            Text("Our AI is analyzing your profile and creating personalized business opportunities")
-                .font(.system(size: 14))
-                .foregroundColor(.white.opacity(0.7))
-                .multilineTextAlignment(.center)
+            // AI Process Steps
+            VStack(alignment: .leading, spacing: 16) {
+                AIProcessStep(icon: "person.crop.circle.fill.badge.checkmark", text: "Analyzing your skills & personality")
+                AIProcessStep(icon: "lightbulb.fill", text: "Generating innovative ideas")
+                AIProcessStep(icon: "chart.line.uptrend.xyaxis", text: "Calculating viability scores")
+                AIProcessStep(icon: "star.fill", text: "Personalizing recommendations")
+            }
+            .padding(.horizontal, 40)
         }
         .frame(maxHeight: .infinity, alignment: .center)
+    }
+}
+
+struct AIProcessStep: View {
+    let icon: String
+    let text: String
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .foregroundColor(.orange)
+                .frame(width: 24)
+            Text(text)
+                .font(.system(size: 13))
+                .foregroundColor(.white.opacity(0.9))
+        }
     }
 }
 
@@ -250,19 +378,58 @@ struct ResultsStepView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Your Business Ideas")
-                .font(.system(size: 24, weight: .bold))
-                .foregroundColor(.white)
-            
-            Text("Based on your profile, here are personalized ideas:")
-                .font(.system(size: 14))
-                .foregroundColor(.white.opacity(0.7))
-            
             VStack(spacing: 12) {
-                ForEach(viewModel.businessIdeas.prefix(3)) { idea in
-                    IdeaCardCompact(idea: idea)
-                }
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 60))
+                    .foregroundColor(.green)
+                
+                Text("Profile Complete!")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(.white)
+                
+                Text("Your personalized business dashboard is ready")
+                    .font(.system(size: 14))
+                    .foregroundColor(.white.opacity(0.7))
+                    .multilineTextAlignment(.center)
             }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+            
+            VStack(alignment: .leading, spacing: 16) {
+                FeatureItem(icon: "lightbulb.fill", title: "AI Business Ideas", description: "Get personalized recommendations")
+                FeatureItem(icon: "chart.line.uptrend.xyaxis", title: "Progress Tracking", description: "Track goals and milestones")
+                FeatureItem(icon: "sparkles", title: "AI Assistant", description: "Get guidance whenever you need")
+            }
+            .padding(16)
+            .background(Color.white.opacity(0.05))
+            .cornerRadius(12)
+        }
+    }
+}
+
+struct FeatureItem: View {
+    let icon: String
+    let title: String
+    let description: String
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 24))
+                .foregroundColor(Color(red: 1, green: 0.6, blue: 0.2))
+                .frame(width: 40)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+                
+                Text(description)
+                    .font(.system(size: 12))
+                    .foregroundColor(.white.opacity(0.6))
+            }
+            
+            Spacer()
         }
     }
 }

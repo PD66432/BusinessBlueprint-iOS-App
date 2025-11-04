@@ -11,13 +11,19 @@ import SwiftUI
 struct businessappApp: App {
     @StateObject private var authVM = AuthViewModel()
     
+    init() {
+        // Check login status when app launches
+        AuthViewModel().checkLoginStatus()
+    }
+    
     var body: some Scene {
         WindowGroup {
             if authVM.isLoggedIn {
-                MainTabView()
+                RootView()
                     .environmentObject(authVM)
             } else {
                 LaunchView()
+                    .environmentObject(authVM)
             }
         }
     }

@@ -6,6 +6,7 @@ struct DashboardView: View {
     @State private var selectedIdea: BusinessIdea?
     @State private var showAddGoal = false
     @State private var showAddMilestone = false
+    @State private var showAIAssistant = false
     
     var body: some View {
         NavigationStack {
@@ -22,17 +23,41 @@ struct DashboardView: View {
                 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Header
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Your Progress")
-                                .font(.system(size: 28, weight: .bold))
-                                .foregroundColor(.white)
+                        // Header with AI Assistant Button
+                        HStack {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Your Progress")
+                                    .font(.system(size: 28, weight: .bold))
+                                    .foregroundColor(.white)
+                                
+                                Text("Business Blueprint")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.white.opacity(0.7))
+                            }
                             
-                            Text("Business Blueprint")
-                                .font(.system(size: 14))
-                                .foregroundColor(.white.opacity(0.7))
+                            Spacer()
+                            
+                            Button {
+                                showAIAssistant = true
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "sparkles")
+                                    Text("AI")
+                                }
+                                .font(.subheadline.bold())
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .background(
+                                    LinearGradient(
+                                        colors: [.orange, .pink],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .cornerRadius(20)
+                            }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(20)
                         
                         // Overall Progress Card
@@ -151,6 +176,30 @@ struct DashboardView: View {
             AddMilestoneView(isPresented: $showAddMilestone, onSave: { milestone in
                 viewModel.addMilestone(milestone)
             })
+        }
+        .sheet(isPresented: $showAIAssistant) {
+            if let idea = viewModel.selectedBusinessIdea {
+                AIAssistantView(businessIdea: idea)
+            } else {
+                // Provide a default business idea for demo
+                AIAssistantView(businessIdea: BusinessIdea(
+                    id: UUID().uuidString,
+                    title: "Your Business Journey",
+                    description: "Let AI help you build and grow your business",
+                    category: "General",
+                    difficulty: "Medium",
+                    estimatedRevenue: "$50K-$150K/year",
+                    timeToLaunch: "3-6 months",
+                    requiredSkills: ["Entrepreneurship", "Marketing"],
+                    startupCost: "$5K-$10K",
+                    profitMargin: "40-60%",
+                    marketDemand: "High",
+                    competition: "Medium",
+                    createdAt: Date(),
+                    userId: "",
+                    personalizedNotes: "Start your entrepreneurial journey today"
+                ))
+            }
         }
     }
 }
