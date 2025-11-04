@@ -9,9 +9,16 @@ import SwiftUI
 
 @main
 struct businessappApp: App {
+    @StateObject private var authVM = AuthViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if authVM.isLoggedIn {
+                MainTabView()
+                    .environmentObject(authVM)
+            } else {
+                LaunchView()
+            }
         }
     }
 }
