@@ -450,17 +450,22 @@ class GoogleAIService {
         for line in lines {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
             
-            if trimmed.starts(with: "IDEA") && !currentIdea.isEmpty {
+            // Start of a new idea - save the previous one
+            if trimmed.uppercased().starts(with: "IDEA") && !currentIdea.isEmpty {
                 if let idea = createBusinessIdea(from: currentIdea) {
                     ideas.append(idea)
                 }
                 currentIdea = [:]
-            } else if trimmed.contains(":") {
+            } else if trimmed.contains(":") && !trimmed.isEmpty {
+                // Parse key:value pairs, handling colons in values
                 let parts = trimmed.components(separatedBy: ":")
                 if parts.count >= 2 {
                     let key = parts[0].trimmingCharacters(in: .whitespaces).lowercased()
                     let value = parts[1...].joined(separator: ":").trimmingCharacters(in: .whitespaces)
-                    currentIdea[key] = value
+                    // Only add non-empty values
+                    if !value.isEmpty {
+                        currentIdea[key] = value
+                    }
                 }
             }
         }
@@ -542,7 +547,8 @@ class GoogleAIService {
         let options = lines
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty && !$0.starts(with: "-") && !$0.starts(with: "*") }
-            .map { $0.replacingOccurrences(of: "^[0-9]+\\.\\s*", with: "", options: .regularExpression) }
+            // Enhanced regex: handles "1.", "1)", "1 ", bullets "•", and leading dashes/asterisks
+            .map { $0.replacingOccurrences(of: "^[0-9]+[.)]?\\s*|^[•]\\s*", with: "", options: .regularExpression) }
         
         let category = step == 1 ? "skills" : step == 2 ? "personality" : "interests"
         let question = step == 1 ? "What are your key skills?" : step == 2 ? "Select your personality traits" : "What are your interests?"
@@ -579,8 +585,8 @@ class GoogleAIService {
                 currentSection = "threats"
             } else if trimmed.uppercased().contains("RECOMMENDATIONS") {
                 currentSection = "recommendations"
-            } else if trimmed.starts(with: "-") || trimmed.starts(with: "•") {
-                let item = trimmed.replacingOccurrences(of: "^[-•]\\s*", with: "", options: .regularExpression)
+            } else if trimmed.starts(with: "-") || trimmed.starts(with: "•") || trimmed.starts(with: "*") {
+                let item = trimmed.replacingOccurrences(of: "^[-•*]\\s*", with: "", options: .regularExpression)
                 switch currentSection {
                 case "strengths": strengths.append(item)
                 case "weaknesses": weaknesses.append(item)
@@ -607,7 +613,8 @@ class GoogleAIService {
         return lines
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
-            .map { $0.replacingOccurrences(of: "^[0-9]+\\.\\s*", with: "", options: .regularExpression) }
+            // Enhanced regex: handles "1.", "1)", "1 ", bullets, and dashes
+            .map { $0.replacingOccurrences(of: "^[0-9]+[.)]?\\s*|^[-•*]\\s*", with: "", options: .regularExpression) }
             .prefix(3)
             .map { String($0) }
     }
