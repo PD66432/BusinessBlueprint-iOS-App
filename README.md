@@ -1,19 +1,42 @@
 # Business Blueprint - iOS App
 
-A professional AI-powered iOS application that helps users discover personalized business ideas based on their skills, personality, and interests.
+A professional AI-powered iOS application that helps users discover personalized business ideas based on their skills, personality, and interests. Now featuring a **gamified island-based journey** inspired by Duolingo!
 
-## Features
+## ✨ Key Features
+
+### 🏝️ Interactive Island Timeline (NEW!)
+- **Gamified Journey**: Visual progress through animated islands
+- **Ocean Theme**: Beautiful animated waves and ocean background
+- **Island Types**: Start 🏝️, Regular 🏔️, Milestone 🏰, and Treasure 💎 islands
+- **Animated Boat**: Watch your boat travel between islands as you progress
+- **Interactive**: Tap islands to view details, add notes, and set reminders
+- **Progress Tracking**: Visual progress bar and completion statistics
+
+### 📝 Notes & Reminders System (NEW!)
+- **Island Notes**: Add personal notes to any island/milestone
+- **Smart Reminders**: Set time-based reminders with notifications
+- **Calendar Integration**: Sync reminders directly to your device calendar
+- **Task Management**: Mark reminders complete and track your commitments
+
+### 🤖 AI Progress Assistant (NEW!)
+- **Chat Interface**: Natural conversation about your progress
+- **Quick Actions**: Pre-built prompts for common questions
+- **Context-Aware**: AI knows your position and provides relevant advice
+- **Timeline Modification**: Ask AI to adjust your goals and timeline
+- **Motivational Support**: Encouraging guidance throughout your journey
 
 ### 🤖 AI-Powered Business Generation
-- Google AI Studio integration for intelligent business idea generation
+- Google Gemini AI integration for intelligent business idea generation
 - Personalized recommendations based on user profile
 - Real-time AI suggestions for next steps
+- Enhanced prompt engineering for better responses
 
 ### 📊 Dashboard & Analytics
 - Real-time progress tracking with visual charts
 - Daily goals management
 - Milestone tracking with timelines
 - Completion statistics and analytics graphs
+- Dual view: Journey mode + Traditional stats
 
 ### 🎯 Smart Onboarding
 - Interactive quiz flow

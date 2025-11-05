@@ -6,23 +6,30 @@ struct MainTabView: View {
     var body: some View {
         ZStack {
             TabView(selection: $selectedTab) {
-                // Home/Dashboard Tab
-                DashboardView()
+                // Island Timeline Tab (Primary Dashboard)
+                IslandTimelineView()
                     .tag(0)
                     .tabItem {
-                        Label("Dashboard", systemImage: "chart.bar.fill")
+                        Label("Journey", systemImage: "map.fill")
+                    }
+                
+                // Traditional Dashboard Tab
+                DashboardView()
+                    .tag(1)
+                    .tabItem {
+                        Label("Stats", systemImage: "chart.bar.fill")
                     }
                 
                 // Business Ideas Tab
                 BusinessIdeasView()
-                    .tag(1)
+                    .tag(2)
                     .tabItem {
                         Label("Ideas", systemImage: "lightbulb.fill")
                     }
                 
                 // Profile Tab
                 ProfileView()
-                    .tag(2)
+                    .tag(3)
                     .tabItem {
                         Label("Profile", systemImage: "person.fill")
                     }

@@ -391,7 +391,8 @@ class GoogleAIService {
         """
     }
     
-    private func makeAIRequest(prompt: String, completion: @escaping (Result<String, Error>) -> Void) {
+    // Make this public so IslandTimelineViewModel can use it
+    func makeAIRequest(prompt: String, completion: @escaping (Result<String, Error>) -> Void) {
         let requestBody: [String: Any] = [
             "contents": [
                 [
