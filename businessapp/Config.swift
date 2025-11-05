@@ -14,10 +14,12 @@ struct Config {
             return key
         }
         // Fallback: Load from Info.plist if available
-        if let key = Bundle.main.infoDictionary?["GOOGLE_AI_API_KEY"] as? String {
+        if let key = Bundle.main.infoDictionary?["GOOGLE_AI_API_KEY"] as? String, !key.isEmpty {
             return key
         }
-        fatalError("❌ GOOGLE_AI_API_KEY not set. Please configure it in your environment.")
+        // ⚠️ TEMPORARY: Hardcoded key for development
+        // TODO: Move to secure environment variable or Xcode build settings before production
+        return "AIzaSyDwtGElGSno15x83lQvgSvsaTIX98ca4A4"
     }()
     
     /// Firebase Project Configuration
