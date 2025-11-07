@@ -45,7 +45,7 @@ struct TimelineFinal: View {
     }
     
     private var backgroundView: some View {
-        Color(hex: "0F172A")
+        AppColors.backgroundGradient
             .ignoresSafeArea()
     }
     

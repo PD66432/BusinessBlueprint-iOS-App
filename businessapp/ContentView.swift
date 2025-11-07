@@ -8,11 +8,21 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject private var authVM: AuthViewModel
+    
     var body: some View {
-        MainAppView()
+        Group {
+            if authVM.isLoggedIn {
+                MainTabViewNew()
+            } else {
+                AuthView(viewModel: authVM)
+            }
+        }
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(AuthViewModel())
+        .environmentObject(BusinessPlanStore())
 }

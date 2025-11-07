@@ -692,7 +692,10 @@ class GoogleAIService {
                        let content = firstCandidate["content"] as? [String: Any],
                        let parts = content["parts"] as? [[String: Any]],
                        let firstPart = parts.first,
-                       let text = firstPart["text"] as? String {
+                       var text = firstPart["text"] as? String {
+                        
+                        // Clean AI response - remove markdown formatting
+                        text = self.cleanAIResponse(text)
                         
                         // Track conversation in user context
                         let topics = self.extractTopics(from: message)
@@ -716,6 +719,19 @@ class GoogleAIService {
                 completion(.failure(error))
             }
         }
+    }
+    
+    // Clean AI response by removing markdown formatting characters
+    private func cleanAIResponse(_ text: String) -> String {
+        var cleaned = text
+        // Remove asterisks used for bold/italic
+        cleaned = cleaned.replacingOccurrences(of: "**", with: "")
+        cleaned = cleaned.replacingOccurrences(of: "*", with: "")
+        // Remove hashtags used for headers (but keep # in middle of words)
+        cleaned = cleaned.replacingOccurrences(of: "^#{1,6}\\s+", with: "", options: .regularExpression)
+        // Remove extra slashes
+        cleaned = cleaned.replacingOccurrences(of: "//", with: "")
+        return cleaned
     }
     
     private func extractTopics(from message: String) -> [String] {

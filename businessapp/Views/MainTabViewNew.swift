@@ -13,36 +13,44 @@ struct MainTabViewNew: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
+                DiscoverView()
+            }
+            .tabItem {
+                Label("Discover", systemImage: "lightbulb.fill")
+            }
+            .tag(0)
+            
+            NavigationStack {
                 TimelineFinal(timelineVM: timelineVM)
             }
             .tabItem {
-                Label("Journey", systemImage: "map.fill")
+                Label("Timeline", systemImage: "map.fill")
             }
-            .tag(0)
+            .tag(1)
             
             NavigationStack {
                 PlannerNotesView(timelineVM: timelineVM)
             }
             .tabItem {
-                Label("Planner", systemImage: "doc.text.magnifyingglass")
-            }
-            .tag(1)
-            
-            NavigationStack {
-                CoachHubView(timelineVM: timelineVM)
-            }
-            .tabItem {
-                Label("Coach", systemImage: "sparkles")
+                Label("Notes", systemImage: "doc.text.fill")
             }
             .tag(2)
+            
+            NavigationStack {
+                EnhancedCoachView(timelineVM: timelineVM)
+            }
+            .tabItem {
+                Label("AI Coach", systemImage: "sparkles")
+            }
+            .tag(3)
             
             NavigationStack {
                 SettingsView()
             }
             .tabItem {
-                Label("Settings", systemImage: "gear")
+                Label("Settings", systemImage: "gearshape.fill")
             }
-            .tag(3)
+            .tag(4)
         }
         .environmentObject(experienceVM)
         .tint(AppColors.primary)
@@ -64,10 +72,10 @@ struct MainTabViewNew: View {
             checkOnboardingStatus()
         }
         .onReceive(NotificationCenter.default.publisher(for: .switchToPlannerTab)) { _ in
-            selectedTab = 1
+            selectedTab = 2
         }
         .onReceive(NotificationCenter.default.publisher(for: .switchToJourneyTab)) { _ in
-            selectedTab = 0
+            selectedTab = 1
         }
         .sheet(isPresented: $showingOnboarding) {
             OnboardingFlow()

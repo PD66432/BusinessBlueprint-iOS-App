@@ -95,6 +95,10 @@ struct EnhancedCoachView: View {
                             }
                         }
                     }
+                    .onTapGesture {
+                        // Dismiss keyboard when tapping outside
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    }
                 }
                 
                 // Quick Actions
