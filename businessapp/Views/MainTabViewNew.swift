@@ -37,10 +37,10 @@ struct MainTabViewNew: View {
             .tag(2)
             
             NavigationStack {
-                EnhancedCoachView(timelineVM: timelineVM)
+                NewAIAssistantView()
             }
             .tabItem {
-                Label("AI Coach", systemImage: "sparkles")
+                Label("AI Assistant", systemImage: "sparkles")
             }
             .tag(3)
             
@@ -78,7 +78,7 @@ struct MainTabViewNew: View {
             selectedTab = 1
         }
         .sheet(isPresented: $showingOnboarding) {
-            OnboardingFlow()
+            OnboardingView()
         }
     }
     

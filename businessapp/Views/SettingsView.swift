@@ -266,7 +266,7 @@ struct SettingsView: View {
             Text("This action cannot be undone. All your data will be permanently deleted.")
         }
         .sheet(isPresented: $showingOnboarding) {
-            OnboardingFlow()
+            OnboardingView()
         }
         .sheet(isPresented: $showingExportData) {
             ExportDataView()

@@ -12,6 +12,8 @@ struct OnboardingQuestionaireView: View {
     @State private var index = 0  // Index of presented view
     @State private var selectedEntry = Array(1...StaticQuestions.questions[0].answerImage.count).map { _ in false }
     @StateObject var viewModel = OnboardingViewModel()
+    @State private var navigateToAuth = false
+    @EnvironmentObject private var authVM: AuthViewModel
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
@@ -80,29 +82,43 @@ struct OnboardingQuestionaireView: View {
                 
                 Spacer()
                 
-                Button(action: {  // Continue Button
-                    if(index < 3) {
-                        index = index + 1
-                        viewModel.getQuestionAtIndex(index: index)
-                        
-                        if(StaticQuestions.questions[index].answerText.count > 0) {
-                            selectedEntry = []
-                            selectedEntry = Array(1...StaticQuestions.questions[index].answerText.count).map { _ in false }
+                if index < 6 {  // Not at the last question yet
+                    Button(action: {  // Continue Button
+                        if(index < 3) {
+                            index = index + 1
+                            viewModel.getQuestionAtIndex(index: index)
+                            
+                            if(StaticQuestions.questions[index].answerText.count > 0) {
+                                selectedEntry = []
+                                selectedEntry = Array(1...StaticQuestions.questions[index].answerText.count).map { _ in false }
+                            }
+                            
+                            progress = CGFloat(index + 1) / 7.0
                         }
-                        
-                        progress = CGFloat(index + 1) / 7.0
+                    }) {
+                        Text("Continue")
+                            .font(.system(size: 20))
+                            .bold()
+                            .foregroundStyle(.white)
+                            .padding(EdgeInsets(top: 16, leading: 100, bottom: 16, trailing: 100))
+                            .background(isEnableContinueButton() ? .green : .gray)
+                            .clipShape(.rect(cornerRadius: 10))
                     }
-                }) {
-                    Text("Continue")
-                        .font(.system(size: 20))
-                        .bold()
-                        .foregroundStyle(.white)
-                        .padding(EdgeInsets(top: 16, leading: 100, bottom: 16, trailing: 100))
-                        .background(isEnableContinueButton() ? .green : .gray)
-                        .clipShape(.rect(cornerRadius: 10))
+                    .padding(.leading, 50)
+                    .disabled(!isEnableContinueButton())
+                } else {  // Last question - navigate to AuthView
+                    NavigationLink(destination: AuthView(viewModel: authVM, isSignUp: true)) {
+                        Text("Complete")
+                            .font(.system(size: 20))
+                            .bold()
+                            .foregroundStyle(.white)
+                            .padding(EdgeInsets(top: 16, leading: 100, bottom: 16, trailing: 100))
+                            .background(isEnableContinueButton() ? .green : .gray)
+                            .clipShape(.rect(cornerRadius: 10))
+                    }
+                    .padding(.leading, 50)
+                    .disabled(!isEnableContinueButton())
                 }
-                .padding(.leading, 50)
-                .disabled(!isEnableContinueButton())
             }
         }
         .navigationBarBackButtonHidden(true)

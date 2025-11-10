@@ -45,7 +45,7 @@ struct TimelineFinal: View {
     }
     
     private var backgroundView: some View {
-        AppColors.backgroundGradient
+        Color.white
             .ignoresSafeArea()
     }
     
@@ -61,7 +61,7 @@ struct TimelineFinal: View {
             HStack {
                 Text("Timeline")
                     .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
                 Spacer()
                 
                 // Simple Add Button
@@ -70,20 +70,21 @@ struct TimelineFinal: View {
                 }) {
                     Image(systemName: "plus.circle.fill")
                         .font(.system(size: 28))
-                        .foregroundColor(Color(hex: "6366F1"))
+                        .foregroundColor(Color.green)
                 }
             }
             
             HStack {
                 Text("\(completedCount) of \(totalCount) stages completed")
                     .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.7))
+                    .foregroundColor(.gray)
                 Spacer()
             }
         }
         .padding(.horizontal, 24)
         .padding(.top, 60)
         .padding(.bottom, 20)
+        .background(Color.white)
     }
     
     private var timelineScrollView: some View {
@@ -96,6 +97,7 @@ struct TimelineFinal: View {
             .padding(.top, 40)
             .padding(.bottom, 100)
         }
+        .background(Color.white)
     }
     
     private func createProgressNode(for island: Island, at index: Int) -> some View {
@@ -317,11 +319,11 @@ private struct ProgressMapNode: View {
         if isCompleted {
             return Color.green
         } else if isCurrent {
-            return Color.indigo
+            return Color.green.opacity(0.8)
         } else if isLocked {
-            return Color.gray.opacity(0.3)
+            return Color.gray.opacity(0.2)
         } else {
-            return Color.indigo
+            return Color.green.opacity(0.6)
         }
     }
     
@@ -329,9 +331,9 @@ private struct ProgressMapNode: View {
         if isCompleted {
             return Color.green
         } else if isCurrent {
-            return Color.indigo
+            return Color.green
         } else {
-            return Color.gray.opacity(0.4)
+            return Color.gray.opacity(0.3)
         }
     }
     
@@ -374,21 +376,21 @@ private struct ProgressMapNode: View {
                 }
             }) {
                 ZStack {
-                    // Progress ring background
+                    // Progress ring background - cleaner
                     Circle()
-                        .stroke(Color.gray.opacity(0.2), lineWidth: 6)
-                        .frame(width: 90, height: 90)
+                        .stroke(Color.gray.opacity(0.15), lineWidth: 8)
+                        .frame(width: 100, height: 100)
                     
-                    // Animated progress ring
+                    // Animated progress ring - green with smooth animation
                     Circle()
                         .trim(from: 0, to: progressRingValue)
                         .stroke(
-                            borderColor,
-                            style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                            Color.green,
+                            style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round)
                         )
-                        .frame(width: 90, height: 90)
+                        .frame(width: 100, height: 100)
                         .rotationEffect(.degrees(-90))
-                        .animation(.easeInOut(duration: 1.0).delay(animationDelay), value: progressRingValue)
+                        .animation(.spring(response: 0.8, dampingFraction: 0.8).delay(animationDelay), value: progressRingValue)
                     
                     // Glow effect for current stage
                     if isCurrent && !isLocked {
@@ -400,14 +402,19 @@ private struct ProgressMapNode: View {
                             .animation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true).delay(animationDelay + 0.3), value: pulse)
                     }
                     
-                    // Main circle
+                    // Main circle - improved with better shadow
                     Circle()
                         .fill(backgroundColor)
-                        .frame(width: 80, height: 80)
+                        .frame(width: 70, height: 70)
+                        .overlay(
+                            Circle()
+                                .stroke(Color.white, lineWidth: 3)
+                        )
                         .shadow(
-                            color: backgroundColor.opacity(isCompleted ? 0.8 : 0.5),
-                            radius: isCompleted ? 25 : 20,
-                            y: isCompleted ? 10 : 8
+                            color: isCompleted ? Color.green.opacity(0.4) : Color.gray.opacity(0.2),
+                            radius: isCompleted ? 15 : 8,
+                            x: 0,
+                            y: isCompleted ? 5 : 3
                         )
                         .scaleEffect(scale)
                     
@@ -429,8 +436,8 @@ private struct ProgressMapNode: View {
                     
                     // Icon with enhanced animations
                     Image(systemName: iconName)
-                        .font(.system(size: isCompleted ? 32 : 28, weight: .bold))
-                        .foregroundColor(iconColor)
+                        .font(.system(size: isCompleted ? 28 : 24, weight: .bold))
+                        .foregroundColor(isCompleted || isCurrent ? .white : (isLocked ? .gray : .white))
                         .scaleEffect(scale * (pulse && isCurrent ? 1.1 : 1.0))
                         .rotationEffect(.degrees(isCompleted && hasAnimated ? 360 : 0))
                         .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(animationDelay + 0.2), value: scale)
@@ -444,14 +451,22 @@ private struct ProgressMapNode: View {
                     scale = 1.0
                 }
                 
-                // Animate progress ring
+                // Animate progress ring - better progress calculation
                 DispatchQueue.main.asyncAfter(deadline: .now() + animationDelay + 0.3) {
                     if isCompleted {
-                        progressRingValue = 1.0
+                        withAnimation(.spring(response: 1.0, dampingFraction: 0.7)) {
+                            progressRingValue = 1.0
+                        }
                     } else if isCurrent {
-                        progressRingValue = 0.7 // Partial progress for current
+                        withAnimation(.spring(response: 0.8, dampingFraction: 0.8)) {
+                            progressRingValue = 0.65 // Partial progress for current
+                        }
                     } else if !isLocked {
-                        progressRingValue = 0.3 // Small progress for available
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.9)) {
+                            progressRingValue = 0.25 // Small progress for available
+                        }
+                    } else {
+                        progressRingValue = 0.0
                     }
                 }
                 
@@ -480,18 +495,18 @@ private struct ProgressMapNode: View {
             // Stage label
             Text("Stage \(index + 1)")
                 .font(.system(size: 12, weight: .medium, design: .rounded))
-                .foregroundColor(isLocked ? .gray : .white.opacity(0.8))
+                .foregroundColor(isLocked ? .gray : .black)
                 .offset(x: offset * 0.3)
                 .scaleEffect(scale * 0.9)
                 .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(animationDelay + 0.4), value: scale)
             
             // Island title (truncated)
             Text(island.title)
-                .font(.system(size: 10, weight: .regular, design: .rounded))
-                .foregroundColor(isLocked ? .gray.opacity(0.6) : .white.opacity(0.6))
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundColor(isLocked ? .gray.opacity(0.7) : .black.opacity(0.8))
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
-                .frame(maxWidth: 80)
+                .frame(maxWidth: 100)
                 .offset(x: offset * 0.2)
                 .scaleEffect(scale * 0.8)
                 .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(animationDelay + 0.5), value: scale)
@@ -521,86 +536,109 @@ private struct DottedPath: View {
     let nextOffset: CGFloat
     let animationDelay: Double
     
-    @State private var animatedDots: [Bool] = Array(repeating: false, count: 12)
-    @State private var filledDots: [Bool] = Array(repeating: false, count: 12)
+    @State private var pathProgress: CGFloat = 0.0
+    @State private var animatedDots: [Bool] = Array(repeating: false, count: 15)
     
     var body: some View {
-        VStack(spacing: 4) {
-            ForEach(0..<12, id: \.self) { index in
-                ZStack {
-                    // Background dot
-                    Circle()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(width: dotSize(for: index), height: dotSize(for: index))
-                        .offset(x: getDotOffset(for: index))
-                        .scaleEffect(animatedDots[index] ? 1.0 : 0.3)
-                        .opacity(animatedDots[index] ? 1.0 : 0.3)
+        GeometryReader { geometry in
+            ZStack {
+                // Smooth curved path using Canvas
+                Path { path in
+                    let startY = geometry.size.height * 0.1
+                    let endY = geometry.size.height * 0.9
+                    let midY = geometry.size.height * 0.5
                     
-                    // Filled dot that appears progressively
-                    if filledDots[index] {
-                        Circle()
-                            .fill(dotFillColor(for: index))
-                            .frame(width: dotSize(for: index), height: dotSize(for: index))
-                            .offset(x: getDotOffset(for: index))
-                            .scaleEffect(1.2)
-                            .animation(.spring(response: 0.4, dampingFraction: 0.6), value: filledDots[index])
+                    // Create smooth bezier curve
+                    path.move(to: CGPoint(x: geometry.size.width / 2 + offset, y: startY))
+                    path.addCurve(
+                        to: CGPoint(x: geometry.size.width / 2 + nextOffset, y: endY),
+                        control1: CGPoint(x: geometry.size.width / 2 + offset + (nextOffset - offset) * 0.3, y: midY - 20),
+                        control2: CGPoint(x: geometry.size.width / 2 + offset + (nextOffset - offset) * 0.7, y: midY + 20)
+                    )
+                }
+                .stroke(
+                    Color.gray.opacity(0.2),
+                    style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round, dash: [6, 4])
+                )
+                
+                // Progress path - green filled
+                Path { path in
+                    let startY = geometry.size.height * 0.1
+                    let endY = geometry.size.height * 0.9
+                    let midY = geometry.size.height * 0.5
+                    
+                    path.move(to: CGPoint(x: geometry.size.width / 2 + offset, y: startY))
+                    
+                    // Calculate progress point along curve
+                    let progressY = startY + (endY - startY) * pathProgress
+                    let progressX = calculateXAlongCurve(progress: pathProgress, offset: offset, nextOffset: nextOffset, width: geometry.size.width)
+                    
+                    path.addCurve(
+                        to: CGPoint(x: progressX, y: progressY),
+                        control1: CGPoint(x: geometry.size.width / 2 + offset + (nextOffset - offset) * 0.3, y: midY - 20),
+                        control2: CGPoint(x: geometry.size.width / 2 + offset + (nextOffset - offset) * 0.7, y: midY + 20)
+                    )
+                }
+                .stroke(
+                    Color.green,
+                    style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
+                )
+                .opacity(pathProgress > 0 ? 1 : 0)
+                
+                // Animated dots along path
+                ForEach(0..<15, id: \.self) { index in
+                    let dotProgress = CGFloat(index) / 14.0
+                    let dotX = calculateXAlongCurve(progress: dotProgress, offset: offset, nextOffset: nextOffset, width: geometry.size.width)
+                    let dotY = geometry.size.height * 0.1 + (geometry.size.height * 0.8) * dotProgress
+                    let isFilled = isCompleted && dotProgress <= pathProgress
+                    
+                    Circle()
+                        .fill(isFilled ? Color.green : Color.gray.opacity(0.3))
+                        .frame(width: isFilled ? 6 : 4, height: isFilled ? 6 : 4)
+                        .position(x: dotX, y: dotY)
+                        .scaleEffect(animatedDots[index] ? 1.0 : 0.5)
+                        .opacity(animatedDots[index] ? 1.0 : 0.3)
+                }
+            }
+        }
+        .frame(height: 100)
+        .onAppear {
+            // Animate dots appearing
+            DispatchQueue.main.asyncAfter(deadline: .now() + animationDelay) {
+                for index in 0..<15 {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.03) {
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                            animatedDots[index] = true
+                        }
+                    }
+                }
+            }
+            
+            // Animate path progress if completed
+            if isCompleted {
+                DispatchQueue.main.asyncAfter(deadline: .now() + animationDelay + 0.5) {
+                    withAnimation(.easeInOut(duration: 1.0)) {
+                        pathProgress = 1.0
                     }
                 }
             }
         }
-        .frame(height: 90)
-        .onAppear {
-            // Show background dots first
-            DispatchQueue.main.asyncAfter(deadline: .now() + animationDelay) {
-                withAnimation(.easeOut(duration: 0.6)) {
-                    animatedDots = Array(repeating: true, count: 12)
-                }
-            }
-            
-            // Fill dots progressively if completed
-            if isCompleted {
-                fillDotsProgressively()
-            }
-        }
     }
     
-    private func dotFillColor(for index: Int) -> Color {
-        let colors: [Color] = [.green, .blue, .indigo, .purple, .pink]
-        return colors[index % colors.count].opacity(0.9)
-    }
-    
-    private func dotSize(for index: Int) -> CGFloat {
-        // Vary dot sizes for visual interest with bigger range
-        let sizes: [CGFloat] = [3, 5, 4, 6, 5, 4, 5, 3, 4, 5, 6, 4]
-        return sizes[index % sizes.count]
-    }
-    
-    private func getDotOffset(for index: Int) -> CGFloat {
-        // Create a smooth curved path from current to next offset
-        let progress = CGFloat(index) / 11.0
-        let curveIntensity: CGFloat = 0.85
-        
-        // Enhanced bezier curve calculation for smoother path
-        let controlPoint1 = offset + (nextOffset - offset) * 0.25 + (offset > nextOffset ? -35 : 35)
-        let controlPoint2 = offset + (nextOffset - offset) * 0.75 + (offset > nextOffset ? 25 : -25)
-        
+    private func calculateXAlongCurve(progress: CGFloat, offset: CGFloat, nextOffset: CGFloat, width: CGFloat) -> CGFloat {
+        let centerX = width / 2
         let t = progress
-        let point = pow(1 - t, 3) * offset +
-                   3 * pow(1 - t, 2) * t * controlPoint1 +
-                   3 * (1 - t) * pow(t, 2) * controlPoint2 +
-                   pow(t, 3) * nextOffset
         
-        return point * curveIntensity
-    }
-    
-    private func fillDotsProgressively() {
-        for index in 0..<12 {
-            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.08 + animationDelay + 0.8) {
-                withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
-                    filledDots[index] = true
-                }
-            }
-        }
+        // Cubic bezier curve calculation for smooth path
+        let control1X = offset + (nextOffset - offset) * 0.3
+        let control2X = offset + (nextOffset - offset) * 0.7
+        
+        let x = pow(1 - t, 3) * offset +
+                3 * pow(1 - t, 2) * t * control1X +
+                3 * (1 - t) * pow(t, 2) * control2X +
+                pow(t, 3) * nextOffset
+        
+        return centerX + x
     }
 }
 
