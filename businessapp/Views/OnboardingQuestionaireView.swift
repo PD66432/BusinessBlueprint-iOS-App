@@ -1,6 +1,6 @@
 //
 //  OnboardingQuestionaireView.swift
-//  BlueprintTest
+//  businessapp
 //
 //  Created by Євген Жадан on 06.11.2025.
 //
@@ -10,10 +10,8 @@ import SwiftUI
 struct OnboardingQuestionaireView: View {
     @State private var progress = 0.1  // Progress bar value
     @State private var index = 0  // Index of presented view
-    @State private var selectedEntry = Array(1...StaticQuestions.questions[0].answerImage.count).map { _ in false }
+    @State private var selectedEntry: [Bool] = []
     @StateObject var viewModel = OnboardingViewModel()
-    @State private var navigateToAuth = false
-    @EnvironmentObject private var authVM: AuthViewModel
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
@@ -49,12 +47,13 @@ struct OnboardingQuestionaireView: View {
                     Image("duoReading")
                         .resizable()
                         .scaledToFit()
+                        .frame(width: 100, height: 100)
                     
                     ZStack {
-                        SpeachBubble(cornerRadius: 20, isBottom: false, pointLocation: 20)
+                        SpeechBubble(cornerRadius: 20, isBottom: false, pointLocation: 20)
                             .fill(.green)
                         
-                        Text(StaticQuestions.questions[index].query)  // Question
+                        Text(viewModel.question.query)  // Question
                             .font(.system(size: 20))
                             .bold()
                             .foregroundStyle(.white)
@@ -65,7 +64,7 @@ struct OnboardingQuestionaireView: View {
                 }
                 
                 if index == 0 {
-                    Text("For English speakers")
+                    Text("Choose your goal")
                         .font(.system(size: 25))
                         .bold()
                         .foregroundStyle(.black)
@@ -82,46 +81,38 @@ struct OnboardingQuestionaireView: View {
                 
                 Spacer()
                 
-                if index < 6 {  // Not at the last question yet
-                    Button(action: {  // Continue Button
-                        if(index < 3) {
-                            index = index + 1
-                            viewModel.getQuestionAtIndex(index: index)
-                            
-                            if(StaticQuestions.questions[index].answerText.count > 0) {
-                                selectedEntry = []
-                                selectedEntry = Array(1...StaticQuestions.questions[index].answerText.count).map { _ in false }
-                            }
-                            
-                            progress = CGFloat(index + 1) / 7.0
-                        }
-                    }) {
-                        Text("Continue")
-                            .font(.system(size: 20))
-                            .bold()
-                            .foregroundStyle(.white)
-                            .padding(EdgeInsets(top: 16, leading: 100, bottom: 16, trailing: 100))
-                            .background(isEnableContinueButton() ? .green : .gray)
-                            .clipShape(.rect(cornerRadius: 10))
+                Button(action: {  // Continue Button
+                    if(index < StaticQuestions.questions.count - 1) {
+                        index = index + 1
+                        viewModel.getQuestionAtIndex(index: index)
+                        
+                        // Initialize selectedEntry array for new question
+                        selectedEntry = Array(repeating: false, count: StaticQuestions.questions[index].answerText.count)
+                        
+                        progress = CGFloat(index + 1) / CGFloat(StaticQuestions.questions.count)
+                    } else {
+                        // Complete onboarding
+                        UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+                        self.presentationMode.wrappedValue.dismiss()
                     }
-                    .padding(.leading, 50)
-                    .disabled(!isEnableContinueButton())
-                } else {  // Last question - navigate to AuthView
-                    NavigationLink(destination: AuthView(viewModel: authVM, isSignUp: true)) {
-                        Text("Complete")
-                            .font(.system(size: 20))
-                            .bold()
-                            .foregroundStyle(.white)
-                            .padding(EdgeInsets(top: 16, leading: 100, bottom: 16, trailing: 100))
-                            .background(isEnableContinueButton() ? .green : .gray)
-                            .clipShape(.rect(cornerRadius: 10))
-                    }
-                    .padding(.leading, 50)
-                    .disabled(!isEnableContinueButton())
+                }) {
+                    Text(index < StaticQuestions.questions.count - 1 ? "Continue" : "Complete")
+                        .font(.system(size: 20))
+                        .bold()
+                        .foregroundStyle(.white)
+                        .padding(EdgeInsets(top: 16, leading: 100, bottom: 16, trailing: 100))
+                        .background(isEnableContinueButton() ? .green : .gray)
+                        .clipShape(.rect(cornerRadius: 10))
                 }
+                .padding(.leading, 50)
+                .disabled(!isEnableContinueButton())
             }
         }
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            // Initialize selectedEntry for first question
+            selectedEntry = Array(repeating: false, count: viewModel.question.answerText.count)
+        }
     }
     
     func isEnableContinueButton() -> Bool {

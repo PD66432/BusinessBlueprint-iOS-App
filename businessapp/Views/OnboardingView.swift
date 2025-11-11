@@ -1,6 +1,6 @@
 //
 //  OnboardingView.swift
-//  BlueprintTest
+//  businessapp
 //
 //  Created by Євген Жадан on 06.11.2025.
 //
@@ -13,88 +13,79 @@ struct OnboardingView: View {
     
     var body: some View {
         NavigationView {
-            ZStack {
-                Color.white
-                    .ignoresSafeArea()
-                
-                VStack {
-                    // Skip button at top
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
-                            self.presentationMode.wrappedValue.dismiss()
-                        }) {
-                            Text("Skip")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundStyle(.gray)
-                        }
-                        .padding(.trailing, 20)
-                        .padding(.top, 20)
+            VStack {
+                HStack {
+                    Button(action: {  // Dismiss button
+                        self.presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Image(systemName: "arrow.backward")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 30)
+                            .foregroundStyle(.gray)
                     }
+                    .padding()
                     
                     Spacer()
+                }
+                .padding(.bottom, 80)
+                
+                ZStack {
+                    SpeechBubble(cornerRadius: 20, isBottom: true, pointLocation: 50)
+                        .fill(.green)
                     
-                    // Speech bubble
-                    ZStack {
-                        SpeachBubble(cornerRadius: 20, isBottom: true, pointLocation: 50)
-                            .fill(.green)
-                        
+                    if index < Texts.onboardingText.count {
                         Text(Texts.onboardingText[index])
                             .font(.system(size: 20))
                             .bold()
                             .foregroundStyle(.white)
                             .padding()
                     }
-                    .frame(width: index == 0 ? 200 : 350, height: 100)
-                    
-                    // Duo character image
-                    Image(index % 2 != 0 ? Images.onboardintImage1 : Images.onboardintImage2)
-                        .scaledToFit()
-                    
-                    // Action buttons
-                    if(index == 1) {
-                        NavigationLink(destination: OnboardingQuestionaireView()) {
-                            Text("Continue")
-                                .font(.system(size: 20))
-                                .bold()
-                                .foregroundStyle(.white)
-                                .padding(EdgeInsets(top: 16, leading: 100, bottom: 16, trailing: 100))
-                                .background(.green)
-                                .cornerRadius(10)
-                                .padding(.top, 150)
-                        }
-                    } else if index >= Texts.onboardingText.count - 1 {
-                        // Last screen - complete onboarding
-                        Button(action: {
-                            UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
-                            self.presentationMode.wrappedValue.dismiss()
-                        }) {
-                            Text("Get Started")
-                                .font(.system(size: 20))
-                                .bold()
-                                .foregroundStyle(.white)
-                                .padding(EdgeInsets(top: 16, leading: 100, bottom: 16, trailing: 100))
-                                .background(.green)
-                                .cornerRadius(10)
-                                .padding(.top, 150)
-                        }
-                    } else {
-                        Button(action: {
-                            index = index + 1
-                        }) {
-                            Text("Continue")
-                                .font(.system(size: 20))
-                                .bold()
-                                .foregroundStyle(.white)
-                                .padding(EdgeInsets(top: 16, leading: 100, bottom: 16, trailing: 100))
-                                .background(.green)
-                                .cornerRadius(10)
-                                .padding(.top, 150)
-                        }
+                }
+                .frame(width: index == 0 ? 200 : 350, height: 100)
+                
+                Image(index % 2 != 0 ? Images.onboardintImage1 : Images.onboardintImage2)
+                    .scaledToFit()
+                
+                if(index == 1) {
+                    NavigationLink(destination: OnboardingQuestionaireView()) {
+                        Text("Continue")
+                            .font(.system(size: 20))
+                            .bold()
+                            .foregroundStyle(.white)
+                            .padding(EdgeInsets(top: 16, leading: 100, bottom: 16, trailing: 100))
+                            .background(.green)
+                            .cornerRadius(10)
+                            .padding(.top, 150)
                     }
-                    
-                    Spacer()
+                } else if index >= Texts.onboardingText.count - 1 {
+                    // Last screen - complete onboarding
+                    Button(action: {
+                        UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+                        self.presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Text("Get Started")
+                            .font(.system(size: 20))
+                            .bold()
+                            .foregroundStyle(.white)
+                            .padding(EdgeInsets(top: 16, leading: 100, bottom: 16, trailing: 100))
+                            .background(.green)
+                            .cornerRadius(10)
+                            .padding(.top, 150)
+                    }
+                } else {
+                    Button(action: {
+                        index = index + 1
+                    }) {
+                        Text("Continue")
+                            .font(.system(size: 20))
+                            .bold()
+                            .foregroundStyle(.white)
+                            .padding(EdgeInsets(top: 16, leading: 100, bottom: 16, trailing: 100))
+                            .background(.green)
+                            .cornerRadius(10)
+                            .padding(.top, 150)
+                    }
                 }
             }
         }
@@ -106,7 +97,7 @@ struct OnboardingView: View {
     OnboardingView()
 }
 
-struct SpeachBubble: Shape {
+struct SpeechBubble: Shape {
     let cornerRadius: CGFloat
     let isBottom: Bool
     let pointLocation: CGFloat

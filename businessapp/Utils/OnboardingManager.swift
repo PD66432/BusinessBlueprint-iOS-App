@@ -1,6 +1,6 @@
 //
 //  OnboardingManager.swift
-//  BlueprintTest
+//  businessapp
 //
 //  Created by Євген Жадан on 07.11.2025.
 //
@@ -14,8 +14,8 @@ class OnboardingManager: ObservableObject {
     
     // Onboarding flow:
     // - OnboardingView: User sees screens 0 and 1 (2 screens), then navigates to questionnaire
-    // - OnboardingQuestionaireView: 8 questionnaire questions
-    // Total steps = 2 onboarding screens + 8 questions = 10 steps
+    // - OnboardingQuestionaireView: questions from StaticQuestions
+    // Total steps = 2 onboarding screens + questions = variable total
     
     static let onboardingScreensCount = 2 // Screens shown before questionnaire (index 0 and 1)
     static let questionnaireQuestionsCount = StaticQuestions.questions.count
@@ -89,4 +89,3 @@ class OnboardingManager: ObservableObject {
         }
     }
 }
-

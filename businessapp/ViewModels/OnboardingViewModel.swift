@@ -1,6 +1,6 @@
 //
 //  OnboardingViewModel.swift
-//  BlueprintTest
+//  businessapp
 //
 //  Created by Євген Жадан on 07.11.2025.
 //
@@ -19,6 +19,8 @@ class OnboardingViewModel: ObservableObject {
     }
     
     func getQuestionAtIndex(index: Int) {
-        question = StaticQuestions.questions[index]
+        if index < StaticQuestions.questions.count {
+            question = StaticQuestions.questions[index]
+        }
     }
 }

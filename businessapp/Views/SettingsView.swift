@@ -136,10 +136,21 @@ struct SettingsView: View {
                         
                         VStack(spacing: 12) {
                             ActionCard(
+                                title: "Reset Onboarding",
+                                subtitle: "Start the welcome tour again",
+                                icon: "arrow.clockwise.circle.fill",
+                                color: AppColors.duolingoGreen
+                            ) {
+                                // Reset onboarding flag and show it again
+                                UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
+                                showingOnboarding = true
+                            }
+                            
+                            ActionCard(
                                 title: "Export Data",
                                 subtitle: "Download your information",
                                 icon: "square.and.arrow.up",
-                                color: AppColors.duolingoGreen
+                                color: AppColors.primaryOrange
                             ) {
                                 showingExportData = true
                             }
@@ -157,7 +168,7 @@ struct SettingsView: View {
                                 title: "Terms of Service",
                                 subtitle: "Legal information",
                                 icon: "doc.text.fill",
-                                color: AppColors.primaryOrange
+                                color: AppColors.primaryPink
                             ) {
                                 // Open terms
                             }
