@@ -7,6 +7,7 @@ struct DashboardViewNew: View {
     @State private var showAddBusinessPlan = false
     @State private var showAddReminder = false
     @State private var showAddNote = false
+    @State private var selectedTab: String = "Today"
     
     var body: some View {
         NavigationStack {
@@ -20,11 +21,15 @@ struct DashboardViewNew: View {
                         // Header
                         headerSection
                         
-                        // Main Content
+                        // Main Content based on selected tab
                         if businessPlanStore.businessIdeas.isEmpty {
                             emptyState
                         } else {
-                            content
+                            if selectedTab == "Today" {
+                                content
+                            } else {
+                                completedTasksContent
+                            }
                         }
                         
                         // Quick Actions Section
@@ -81,19 +86,43 @@ struct DashboardViewNew: View {
                 }
             }
             
-            // Time Period Selector
+            // Time Period Selector / Tab Selector
             HStack(spacing: 20) {
-                Button("Today") {
-                    // Handle today selection
+                Button {
+                    selectedTab = "Today"
+                } label: {
+                    Text("Today")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundColor(selectedTab == "Today" ? .black : .gray)
+                        .padding(.bottom, 8)
+                        .overlay(
+                            selectedTab == "Today" ?
+                            VStack {
+                                Spacer()
+                                RoundedRectangle(cornerRadius: 2)
+                                    .fill(mintGreen)
+                                    .frame(height: 2)
+                            } : nil
+                        )
                 }
-                .font(.subheadline.weight(.medium))
-                .foregroundColor(.black)
                 
-                Button("Yesterday") {
-                    // Handle yesterday selection
+                Button {
+                    selectedTab = "Completed"
+                } label: {
+                    Text("Completed")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundColor(selectedTab == "Completed" ? .black : .gray)
+                        .padding(.bottom, 8)
+                        .overlay(
+                            selectedTab == "Completed" ?
+                            VStack {
+                                Spacer()
+                                RoundedRectangle(cornerRadius: 2)
+                                    .fill(mintGreen)
+                                    .frame(height: 2)
+                            } : nil
+                        )
                 }
-                .font(.subheadline)
-                .foregroundColor(.gray)
                 
                 Spacer()
             }
@@ -126,64 +155,116 @@ struct DashboardViewNew: View {
     }
     
     var content: some View {
-        VStack(spacing: 24) {
-            // Main Progress Card
-            VStack(spacing: 20) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("\(viewModel.completedGoalsCount)")
-                            .font(.system(size: 48, weight: .bold, design: .rounded))
-                            .foregroundColor(.black)
-                        
-                        Text("Goals completed")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                    }
-                    
-                    Spacer()
-                    
-                    // Circular Progress
-                    ZStack {
-                        Circle()
-                            .stroke(Color.gray.opacity(0.2), lineWidth: 8)
-                            .frame(width: 80, height: 80)
-                        
-                        Circle()
-                            .trim(from: 0, to: CGFloat(viewModel.completionPercentage) / 100)
-                            .stroke(mintGreen, style: StrokeStyle(lineWidth: 8, lineCap: .round))
-                            .frame(width: 80, height: 80)
-                            .rotationEffect(.degrees(-90))
-                        
-                        Image(systemName: "target")
-                            .font(.title2)
-                            .foregroundColor(mintGreen)
-                    }
-                }
-                
-                // Stats Row
-                HStack(spacing: 24) {
-                    StatItem(value: "\(viewModel.dailyGoals.count)", label: "Total goals", color: .pink)
-                    StatItem(value: "\(viewModel.milestones.count)", label: "Milestones", color: .orange)
-                    StatItem(value: "\(viewModel.completionPercentage)%", label: "Progress", color: mintGreen)
-                }
-            }
-            .padding(24)
-            .background(Color.white)
-            .cornerRadius(20)
-            .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 2)
+        VStack(spacing: 20) {
+            // Progress Milestone Card
+            ProgressMilestoneCard(
+                milestone: viewModel.milestones.first { !$0.completed },
+                completionPercentage: viewModel.completionPercentage,
+                totalMilestones: viewModel.milestones.count,
+                completedMilestones: viewModel.milestones.filter { $0.completed }.count
+            )
             .padding(.horizontal, 20)
             
-            // Recent Activity
+            // Next Task Card
+            NextTaskCard(
+                task: viewModel.upcomingGoals.first { !$0.completed },
+                onTaskTap: {
+                    // Handle task tap
+                }
+            )
+            .padding(.horizontal, 20)
+            
+            // Recent Activity Section
             if !viewModel.upcomingGoals.isEmpty {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Recently worked on")
+                    Text("All Tasks")
                         .font(.headline)
                         .foregroundColor(.black)
                         .padding(.horizontal, 20)
                     
                     VStack(spacing: 12) {
-                        ForEach(viewModel.upcomingGoals.prefix(1)) { goal in
+                        ForEach(viewModel.upcomingGoals.prefix(3)) { goal in
                             RecentActivityCard(goal: goal)
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                }
+            }
+        }
+    }
+    
+    var completedTasksContent: some View {
+        VStack(spacing: 20) {
+            let completedGoals = viewModel.dailyGoals.filter { $0.completed }
+            
+            if completedGoals.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "checkmark.circle")
+                        .font(.system(size: 48))
+                        .foregroundColor(mintGreen)
+                    
+                    Text("No Completed Tasks Yet")
+                        .font(.headline)
+                        .foregroundColor(.black)
+                    
+                    Text("Complete tasks to see them here")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(40)
+                .background(Color.white)
+                .cornerRadius(20)
+                .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+            } else {
+                VStack(alignment: .leading, spacing: 16) {
+                    // Summary Card
+                    VStack(spacing: 16) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Completed")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                    .textCase(.uppercase)
+                                    .tracking(0.5)
+                                
+                                Text("\(completedGoals.count)")
+                                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                                    .foregroundColor(.black)
+                            }
+                            
+                            Spacer()
+                            
+                            VStack(alignment: .trailing, spacing: 8) {
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 32))
+                                    .foregroundColor(Color(red: 1.0, green: 0.8, blue: 0.0))
+                                
+                                Text("Great work!")
+                                    .font(.caption.weight(.medium))
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                    }
+                    .padding(20)
+                    .background(Color.white)
+                    .cornerRadius(16)
+                    .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    
+                    // Completed Tasks List
+                    Text("Completed Tasks")
+                        .font(.headline)
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 10)
+                    
+                    VStack(spacing: 12) {
+                        ForEach(completedGoals.sorted { $0.dueDate > $1.dueDate }) { goal in
+                            CompletedTaskCard(goal: goal)
                         }
                     }
                     .padding(.horizontal, 20)
