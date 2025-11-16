@@ -34,6 +34,13 @@ You have two options to provide your API key:
 4. Under "Environment Variables", add:
    - Name: `GOOGLE_AI_API_KEY`
    - Value: Your actual API key
+#### Option C: Add key directly to Info.plist
+
+1. Open `Resources/Info.plist` in Xcode
+2. Add a new key `GOOGLE_AI_API_KEY` and paste your actual key as the value
+3. Note: This will embed the key in the app bundle for that build — do not commit the real key to version control; use build settings or XCConfig to inject the value at build time instead.
+
+This app will prefer the key found in `Info.plist`. If you add `$(GOOGLE_AI_API_KEY)` to `Info.plist` you can then set that value from Xcode Build Settings instead of storing it in the file.
 
 ### 3. Verify Setup
 

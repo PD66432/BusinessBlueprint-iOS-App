@@ -24,7 +24,7 @@
 ## 🔑 **API Status**
 
 ### **Gemini API - WORKING ✅**
-- **API Key**: `AIzaSyAy23CL7PUMQ-KSpdJUvmWV1XMq8p_7-7Q`
+- **API Key**: Set via Xcode build settings, `Info.plist` or `.env.local` (see `API_KEY_SETUP.md`)
 - **Model**: `gemini-2.5-flash`
 - **Status**: ✅ **VERIFIED WORKING**
 - **Test Response**: "Hello there, how are you?"

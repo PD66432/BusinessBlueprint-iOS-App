@@ -9,7 +9,7 @@
 ### 1. ✅ Gemini API - WORKING
 **Test Confirmation:**
 ```bash
-$ curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyAy23CL7PUMQ-KSpdJUvmWV1XMq8p_7-7Q"
+$ curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyD-dIEwp3PNhwsGFf67k2VvTs6O2QI1fjo"
 
 Response: {"candidates":[{"content":{"parts":[{"text":"Hello!"}]}}]}
 ```
@@ -303,7 +303,7 @@ Every user action is tracked and used to personalize AI responses:
 ### API Keys
 ```
 Gemini AI:
-  Key: AIzaSyAy23CL7PUMQ-KSpdJUvmWV1XMq8p_7-7Q
+   Key: AIzaSyD-dIEwp3PNhwsGFf67k2VvTs6O2QI1fjo
   Model: gemini-2.5-flash
   Status: ✅ Verified Working
 

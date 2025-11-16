@@ -9,17 +9,24 @@ struct Config {
     /// Google AI API Key - Read from UserDefaults, env, or Info.plist
     /// Set via Settings screen, environment, or Info.plist
     static var googleAIKey: String {
-        if let saved = UserDefaults.standard.string(forKey: "GOOGLE_AI_API_KEY"), !saved.isEmpty {
-            return saved
-        }
-        if let key = ProcessInfo.processInfo.environment["GOOGLE_AI_API_KEY"], !key.isEmpty {
-            return key
-        }
+        // Prefer Info.plist for a single source of truth when the key is embedded
+        // in the app bundle (useful for debugging). Info.plist entries can be
+        // substituted at build time using Xcode build settings or .xcconfig.
         if let key = Bundle.main.infoDictionary?["GOOGLE_AI_API_KEY"] as? String, !key.isEmpty {
             return key
         }
-        // Fallback to pre-configured key
-        return "AIzaSyAy23CL7PUMQ-KSpdJUvmWV1XMq8p_7-7Q"
+        // Fall back to env vars for CI/local dev flows
+        if let key = ProcessInfo.processInfo.environment["GOOGLE_AI_API_KEY"], !key.isEmpty {
+            return key
+        }
+        // Fall back to runtime override (Settings or user defaults)
+        if let saved = UserDefaults.standard.string(forKey: "GOOGLE_AI_API_KEY"), !saved.isEmpty {
+            return saved
+        }
+    // Fallback to pre-configured key - intentionally blank to avoid checked-in secrets.
+    // Use Xcode Build Settings (recommended), ProcessInfo env vars, or Info.plist to provide
+    // a valid key. See `API_KEY_SETUP.md` for setup instructions.
+    return ""
     }
 
     /// Google AI model identifier - override via Settings, env or Info.plist
@@ -33,7 +40,8 @@ struct Config {
         if let model = Bundle.main.infoDictionary?["GOOGLE_AI_MODEL"] as? String, !model.isEmpty {
             return model
         }
-        return "gemini-2.0-flash-exp" // Updated to faster model
+    // Default to a modern Gemini model. Change in Settings or env if needed.
+    return "gemini-2.5-flash"
     }
     
     /// Firebase Project Configuration

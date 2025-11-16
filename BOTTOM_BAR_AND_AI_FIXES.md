@@ -117,9 +117,9 @@ private func sendMessage() {
 
 ### API Configuration:
 **File**: `businessapp/Config.swift`
-- ✅ API Key: `AIzaSyAy23CL7PUMQ-KSpdJUvmWV1XMq8p_7-7Q`
-- ✅ Model: `gemini-2.0-flash-exp`
-- ✅ Endpoint: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent`
+- ✅ API Key: `AIzaSyD-dIEwp3PNhwsGFf67k2VvTs6O2QI1fjo`
+- ✅ Model: `gemini-2.5-flash`
+- ✅ Endpoint: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`
 
 ## Testing Instructions
 
@@ -135,7 +135,7 @@ private func sendMessage() {
 3. Check console logs for debugging info:
    - Should see: `🤖 Sending AI request...`
    - Should see: `🔑 API Key configured: true`
-   - Should see: `🌐 Model: gemini-2.0-flash-exp`
+    - Should see: `🌐 Model: gemini-2.5-flash`
 4. If successful: `✅ AI Response received: [response]`
 5. If error: Detailed error message will appear in chat
 
@@ -152,6 +152,6 @@ If AI still doesn't work:
 2. **API Key**: Verify the key is valid in Google AI Studio
 3. **Network**: Check internet connection
 4. **Quota**: Verify API quota isn't exceeded
-5. **Model**: Ensure `gemini-2.0-flash-exp` is available
+5. **Model**: Ensure `gemini-2.5-flash` is available
 
 The error messages in the chat will now show exactly what's wrong!

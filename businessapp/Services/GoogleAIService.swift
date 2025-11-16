@@ -120,6 +120,14 @@ class GoogleAIService {
         return URLSession(configuration: configuration)
     }()
 
+    private init() {
+        if !apiKey.isEmpty {
+            print("🔒 GoogleAIService: API key loaded from app configuration.")
+        } else {
+            print("⚠️ GoogleAIService: No API key found. Add GOOGLE_AI_API_KEY to Info.plist or env settings.")
+        }
+    }
+
     private func endpointURL() -> URL? {
         guard !apiKey.isEmpty else { return nil }
         return URL(string: "\(baseURLString)?key=\(apiKey)")

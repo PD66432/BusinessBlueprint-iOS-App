@@ -14,7 +14,7 @@
 - **Send button background** is also white glass
 
 ### 3. Ensured AI Functionality Works
-- **API key is properly configured** in Config.swift: `AIzaSyAy23CL7PUMQ-KSpdJUvmWV1XMq8p_7-7Q`
+- **API key is properly configured** in Config.swift (set via env/Info.plist or build settings)
 - **Using Gemini 2.0 Flash Exp model** for fast responses
 - **Send button only activates** when there's actual text to send
 - **Proper error handling** with fallback messages

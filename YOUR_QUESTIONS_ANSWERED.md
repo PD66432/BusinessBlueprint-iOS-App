@@ -4,11 +4,11 @@
 
 ### ✅ YES! It Works!
 
-**API Key**: `AIzaSyAy23CL7PUMQ-KSpdJUvmWV1XMq8p_7-7Q`
+**API Key**: Set via Xcode build settings, `Info.plist` or `.env.local` (see `API_KEY_SETUP.md`)
 
 **Test Result**:
 ```bash
-curl -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyAy23CL7PUMQ-KSpdJUvmWV1XMq8p_7-7Q" \
+curl -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=YOUR_GOOGLE_AI_API_KEY" \
   -H 'Content-Type: application/json' \
   -d '{"contents":[{"parts":[{"text":"Hello"}]}]}'
 

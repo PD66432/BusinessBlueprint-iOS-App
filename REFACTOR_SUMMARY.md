@@ -3,8 +3,8 @@
 ## ✅ Completed Tasks
 
 ### 1. Gemini API Testing
-- **API Key Tested**: `AIzaSyAy23CL7PUMQ-KSpdJUvmWV1XMq8p_7-7Q`
-- **Model**: Updated to `gemini-2.0-flash-exp` (faster, lower token usage)
+- **API Key Tested**: `AIzaSyD-dIEwp3PNhwsGFf67k2VvTs6O2QI1fjo`
+- **Model**: Updated to `gemini-2.5-flash` (faster and more capable)
 - **Status**: ✅ Working perfectly - tested with successful response
 
 ### 2. Firebase Configuration Fixes
