@@ -16,27 +16,40 @@ private enum FirestorePath {
 }
 
 // MARK: - Firebase Service
+/// Centralized service for Firebase operations including authentication and Firestore data access
+/// Uses singleton pattern for shared access and persistent caching for offline support
+/// Thread-safe with async/await and completion handler patterns
 final class FirebaseService {
     static let shared = FirebaseService()
-    
+
     let auth: Auth
     let firestore: Firestore
-    
+
     private init() {
         auth = Auth.auth()
         firestore = Firestore.firestore()
+
+        // Enable persistent cache for offline support and better performance
         let settings = firestore.settings
         settings.cacheSettings = PersistentCacheSettings()
         firestore.settings = settings
+
+        print("🔥 FirebaseService: Initialized with persistent cache enabled")
     }
     
     // MARK: - Auth Helpers
+
+    /// Listens to Firebase authentication state changes
+    /// - Parameter handler: Callback invoked when auth state changes with the current user (nil if logged out)
+    /// - Returns: Listener handle that can be used to remove the listener later
     func listenToAuthChanges(_ handler: @escaping (User?) -> Void) -> AuthStateDidChangeListenerHandle {
         auth.addStateDidChangeListener { _, user in
             handler(user)
         }
     }
-    
+
+    /// Removes an authentication state change listener
+    /// - Parameter handle: The listener handle to remove
     func removeAuthListener(_ handle: AuthStateDidChangeListenerHandle?) {
         guard let handle else { return }
         auth.removeStateDidChangeListener(handle)

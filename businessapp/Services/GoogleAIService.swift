@@ -106,17 +106,24 @@ struct AIBusinessAnalysis: Codable {
     let recommendations: [String]
 }
 
+/// Service for integrating with Google AI (Gemini) API
+/// Provides business idea generation, AI suggestions, and conversational AI capabilities
+/// Uses singleton pattern for shared access and efficient resource management
 class GoogleAIService {
     static let shared = GoogleAIService()
-    
+
     private let apiKey = Config.googleAIKey
     private var baseURLString: String {
         "https://generativelanguage.googleapis.com/v1beta/models/\(Config.googleAIModel):generateContent"
     }
+
+    /// Configured URLSession with optimized timeouts for AI requests
     private lazy var urlSession: URLSession = {
         let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 30
-        configuration.timeoutIntervalForResource = 60
+        configuration.timeoutIntervalForRequest = 30  // 30 second request timeout
+        configuration.timeoutIntervalForResource = 60 // 60 second resource timeout
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData // Always fetch fresh AI responses
+        configuration.urlCache = nil // Disable URL cache to save memory
         return URLSession(configuration: configuration)
     }()
 

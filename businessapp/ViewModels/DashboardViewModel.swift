@@ -2,6 +2,8 @@ import Foundation
 import SwiftUI
 import Combine
 
+/// ViewModel for managing dashboard data including goals, milestones, and AI-powered features
+/// Integrates with Firebase for data persistence and GoogleAI for intelligent recommendations
 class DashboardViewModel: ObservableObject {
     struct NutritionSummary {
         var goal: Int
@@ -55,10 +57,16 @@ class DashboardViewModel: ObservableObject {
     @Published var recentMeals: [MealLog] = []
     
     private var userId: String?
-    
+    private var cancellables = Set<AnyCancellable>()
+
     init(userId: String? = nil) {
         self.userId = userId
         prepareNutritionPreviewIfNeeded()
+    }
+
+    deinit {
+        // Clean up resources and cancel any pending operations
+        cancellables.removeAll()
     }
 
     /// Attach the authenticated user's id so the view model can fetch/save data.
@@ -67,7 +75,9 @@ class DashboardViewModel: ObservableObject {
     }
     
     // MARK: - AI-Powered Features
-    
+
+    /// Generates personalized daily goals using AI based on business idea and current progress
+    /// - Parameter businessIdea: The business idea to generate goals for
     func generateAIDailyGoals(for businessIdea: BusinessIdea) {
         isGeneratingAIContent = true
         
@@ -93,6 +103,8 @@ class DashboardViewModel: ObservableObject {
         }
     }
     
+    /// Retrieves personalized AI advice based on current context and user goals
+    /// - Parameter context: The context for which advice is needed
     func getAIAdvice(context: String) {
         isGeneratingAIContent = true
         let currentGoals = dailyGoals.map { $0.title }
@@ -130,26 +142,33 @@ class DashboardViewModel: ObservableObject {
         addDailyGoal(goal)
     }
     
+    /// Fetches all dashboard data (goals and milestones) from Firebase
+    /// Uses DispatchGroup to coordinate multiple async operations efficiently
+    /// - Parameter businessIdeaId: The business idea ID to fetch data for
     func fetchDashboardData(businessIdeaId: String) {
+        print("📊 DashboardViewModel: Fetching dashboard data for idea \(businessIdeaId)")
         isLoading = true
-        
+
         let group = DispatchGroup()
-        
+
         group.enter()
         FirebaseService.shared.fetchDailyGoals(userId: userId ?? "") { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let goals):
+                    print("✅ DashboardViewModel: Fetched \(goals.count) goals")
                     self?.dailyGoals = goals
                 case .failure(let error):
+                    print("❌ DashboardViewModel: Failed to fetch goals - \(error.localizedDescription)")
                     self?.errorMessage = error.localizedDescription
                 }
                 group.leave()
             }
         }
-        
+
         group.enter()
         guard let userId = userId else {
+            print("⚠️ DashboardViewModel: No userId available")
             group.leave()
             return
         }
@@ -157,15 +176,17 @@ class DashboardViewModel: ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let milestones):
+                    print("✅ DashboardViewModel: Fetched \(milestones.count) milestones")
                     self?.milestones = milestones
                     self?.calculateCompletion()
                 case .failure(let error):
+                    print("❌ DashboardViewModel: Failed to fetch milestones - \(error.localizedDescription)")
                     self?.errorMessage = error.localizedDescription
                 }
                 group.leave()
             }
         }
-        
+
         group.notify(queue: .main) { [weak self] in
             self?.isLoading = false
         }

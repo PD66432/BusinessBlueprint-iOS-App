@@ -2,6 +2,9 @@ import Foundation
 import SwiftUI
 import Combine
 
+/// ViewModel for managing business ideas generation, storage, and selection
+/// This ViewModel integrates with GoogleAIService for idea generation and
+/// Firebase for persistence, while syncing with BusinessPlanStore for global state management
 class BusinessIdeaViewModel: ObservableObject {
     @Published var businessIdeas: [BusinessIdea] = [] {
         didSet {
@@ -72,10 +75,16 @@ class BusinessIdeaViewModel: ObservableObject {
         isSyncingFromStore = false
     }
     
+    /// Generates personalized business ideas based on user profile
+    /// - Parameters:
+    ///   - skills: User's skills and expertise
+    ///   - personality: User's personality traits
+    ///   - interests: User's interests and passions
     func generateIdeas(skills: [String], personality: [String], interests: [String]) {
+        print("📝 BusinessIdeaViewModel: Generating ideas for skills: \(skills.joined(separator: ", "))")
         isLoading = true
         errorMessage = nil
-        
+
         GoogleAIService.shared.generateBusinessIdeas(
             skills: skills,
             personality: personality,
@@ -86,9 +95,11 @@ class BusinessIdeaViewModel: ObservableObject {
                 self.isLoading = false
                 switch result {
                 case .success(let ideas):
+                    print("✅ BusinessIdeaViewModel: Successfully generated \(ideas.count) ideas")
                     self.businessIdeas = ideas
                     self.selectedIdea = ideas.first
                 case .failure(let error):
+                    print("❌ BusinessIdeaViewModel: Failed to generate ideas - \(error.localizedDescription)")
                     self.errorMessage = error.localizedDescription
                 }
             }

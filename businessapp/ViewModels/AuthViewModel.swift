@@ -8,6 +8,10 @@ import FirebaseAnalytics
 import FirebaseCore
 import GoogleSignIn
 
+/// ViewModel for managing user authentication state and operations
+/// Supports email/password, anonymous, Google, and Apple Sign-In
+/// Uses @MainActor to ensure UI updates happen on the main thread
+/// Integrates with FirebaseAuth for secure authentication
 @MainActor
 final class AuthViewModel: NSObject, ObservableObject {
     @Published var isLoggedIn = false
@@ -58,6 +62,11 @@ final class AuthViewModel: NSObject, ObservableObject {
     }
     
     // MARK: - Email / Password
+
+    /// Signs up a new user with email and password
+    /// - Parameters:
+    ///   - email: User's email address
+    ///   - password: User's password (minimum 6 characters)
     func signUp(email: String, password: String) {
         isLoading = true
         firebase.signUpUser(email: email, password: password) { [weak self] result in
@@ -72,6 +81,10 @@ final class AuthViewModel: NSObject, ObservableObject {
         }
     }
     
+    /// Signs in an existing user with email and password
+    /// - Parameters:
+    ///   - email: User's email address
+    ///   - password: User's password
     func signIn(email: String, password: String) {
         isLoading = true
         firebase.signInUser(email: email, password: password) { [weak self] result in

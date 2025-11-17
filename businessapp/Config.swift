@@ -8,32 +8,30 @@ import Foundation
 struct Config {
     /// Google AI API Key - Read from UserDefaults, env, or Info.plist
     /// Set via Settings screen, environment, or Info.plist
+    /// SECURITY: Never hardcode API keys. Always use secure configuration methods.
     static var googleAIKey: String {
-        // Embedded default key for convenience during testing. Use at your own risk.
-        // Security: This is a plain-text key in the repo. If you plan to publish, rotate and move it to env or Keychain.
-        let embeddedKey = "AIzaSyD-dIEwp3PNhwsGFf67k2VvTs6O2QI1fjo"
-        if !embeddedKey.isEmpty { return embeddedKey }
-        // Prefer Info.plist for a single source of truth when the key is embedded
-        // in the app bundle (useful for debugging). Info.plist entries can be
-        // substituted at build time using Xcode build settings or .xcconfig.
+        // Priority 1: Info.plist (recommended for build-time configuration)
+        // Info.plist entries can be substituted at build time using Xcode build settings or .xcconfig
         if let key = Bundle.main.infoDictionary?["GOOGLE_AI_API_KEY"] as? String, !key.isEmpty {
             print("🔍 Config: GOOGLE_AI_API_KEY found in Info.plist (len: \(key.count))")
             return key
         }
-        // Fall back to env vars for CI/local dev flows
+
+        // Priority 2: Environment variables (for CI/CD and local development)
         if let key = ProcessInfo.processInfo.environment["GOOGLE_AI_API_KEY"], !key.isEmpty {
             print("🔍 Config: GOOGLE_AI_API_KEY found in ENV (len: \(key.count))")
             return key
         }
-        // Fall back to runtime override (Settings or user defaults)
+
+        // Priority 3: UserDefaults (for runtime configuration via Settings)
         if let saved = UserDefaults.standard.string(forKey: "GOOGLE_AI_API_KEY"), !saved.isEmpty {
             print("🔍 Config: GOOGLE_AI_API_KEY found in UserDefaults (len: \(saved.count))")
             return saved
         }
-    // Fallback to pre-configured key - intentionally blank to avoid checked-in secrets.
-    // Use Xcode Build Settings (recommended), ProcessInfo env vars, or Info.plist to provide
-    // a valid key. See `API_KEY_SETUP.md` for setup instructions.
-    return ""
+
+        // No key found - user must configure via Settings or build configuration
+        print("⚠️ Config: GOOGLE_AI_API_KEY not configured. Please set in Settings or build configuration.")
+        return ""
     }
 
     /// Google AI model identifier - override via Settings, env or Info.plist
@@ -67,9 +65,6 @@ struct Config {
 
     /// Return the key source for the GOOGLE_AI_API_KEY
     static func googleAIKeySource() -> String {
-        // If the embedded key is used, report Config as the source
-        let embeddedKey = "AIzaSyD-dIEwp3PNhwsGFf67k2VvTs6O2QI1fjo"
-        if !embeddedKey.isEmpty { return "Config" }
         if let key = Bundle.main.infoDictionary?["GOOGLE_AI_API_KEY"] as? String, !key.isEmpty {
             return "Info.plist"
         }
